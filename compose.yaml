@@ -17,6 +17,29 @@ services:
     volumes:
       - ./src/:/var/www/html/
       - ./logs/php.log:/var/log/fpm-php.www.log
+  mysql:
+    image: 'mysql/mysql-server:8.0'
+    ports:
+        - '3306:3306'
+    environment:
+        MYSQL_ROOT_PASSWORD: 'secret'
+        MYSQL_ROOT_HOST: '%'
+        MYSQL_DATABASE: 'example_db'
+        MYSQL_USER: 'phpuser'
+        MYSQL_PASSWORD: 'secret'
+        MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+        - './database:/var/lib/mysql'
+    networks:
+        - sail
+    healthcheck:
+        test:
+            - CMD
+            - mysqladmin
+            - ping
+            - '-p${DB_PASSWORD}'
+        retries: 3
+        timeout: 5s
 networks:
   internal:
     driver: bridge
